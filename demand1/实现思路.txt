@@ -1,0 +1,28 @@
+1. 从 https://cloud.tencent.com/document/product 这个网站获取所有待爬取的页面的链接，按照类别（产品页， 解决方案页，文档页）放进一个对象里面。每一个对象又根据其内部的分类做好映射。
+对象结构：
+    [
+        {
+            title:"产品", //产品,解决方案,文档
+            exec:".J-mainContent,.body" //内容区域的选择器规则
+            menu：[
+                {
+                    title: "计算", //计算，存储，视频服务...
+                    menu: [
+                        {
+                            title:"云服务器cvm", 
+                            link:"https://cloud.tencent.com/product/cvm"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+2. 由于需求只需要将所有的link汇总到一个txt，不需要做分类，所以直接将第一步得到的对象，转成一个list结构。
+3. 遍历第二步德得到list结构，用node的http库get访问请求，拿到html，用cheerio库转换成一个可以用jq语法操控的类dom对象。
+4. 将主题区域（不包括headerNav，footer）的所有a标签爬取出来，对其进行一下操作：
+    （1）过滤掉所有的href属性为”JavaScript:;“,undefine,""的标签。
+    （2）用正则表达式剔除内部带有html结构的a标签。
+    （3）先判断href属性是否为http开头，是的话不进行操作，否则进行一下操作：
+        a.判断href属性是否为//cloud.tencent.com开头，是的话用’https'补全。
+        b.不是//cloud.tencent.com开头，用https://cloud.tencent.com补全。
+5. 每读完一个页面就对对结果文件进行追加操作。

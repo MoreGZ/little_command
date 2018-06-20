@@ -1,0 +1,11 @@
+*.mdb  
+*.ldb  
+*.sln  
+*.config  
+*.zip
+
+result/  
+record/  
+urlLists/
+node_modules/
+public/
