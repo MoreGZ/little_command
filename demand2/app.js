@@ -77,7 +77,30 @@ const readLinkList = function(filename){
     return contentList;
 }
 
-const requestPage = async function(page,link){
+const requestPage2 = async function(page,link){
+    const checkIsIncludeForSure = ($) => {
+        let notFountText = $("#container").find('.c-gap-bottom-small .c-gray').text();
+        return notFountText ? 0 : 1;
+    }
+    const baseUrl = 'https://www.baidu.com/s?wd=';
+    console.log(`search${baseUrl+link}`)
+    await page.goto(baseUrl+link);
+    const content = await page.content();
+
+    const $ = cheerio.load(content, { decodeEntities: false });
+    let numText = $("#container").find('.head_nums_cont_inner .nums_text').text();
+    let patten = /约(.*?)个/
+    console.log(numText)
+    let num = str2Num(patten.exec(numText)[1]);
+    console.log(`${link}： ${num} \n`)
+
+    let isInclude = num !== 0 ? checkIsIncludeForSure($) : 0;
+    let contentString = link + " " + isInclude + "\n"; 
+
+    return contentString;
+}
+
+const requestPage = async function(page, link){
     const baseUrl = 'https://www.baidu.com/s?wd=';
     console.log(`search${baseUrl+link}`)
     await page.goto(baseUrl+link);
@@ -260,7 +283,7 @@ const main = async (filename, complicateCount) => {
     // 打开浏览器
     console.log("开启浏览器");
     const browser = await puppeteer.launch({
-        executablePath:'/Applications/Chromium.app/Contents/MacOS/Chromium'
+        executablePath:'/ApplicationChromiums/.app/Contents/MacOS/Chromium'
     });
     let pageCount = linkLists.length;
     let pageInRequestingCount = pageCount;
